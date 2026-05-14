@@ -84,8 +84,8 @@ def run_models_cached(year_lo: int, year_hi: int, include_year: bool) -> tuple[d
         (full["year"] >= year_lo) & (full["year"] <= year_hi),
         needed,
     ].copy()
-    if len(df) > 30_000:
-        df = df.sample(n=30_000, random_state=42).reset_index(drop=True)
+    if len(df) > 15_000:
+        df = df.sample(n=15_000, random_state=42).reset_index(drop=True)
     gc.collect()
 
     results, comparison = analysis.run_all_models(
@@ -450,7 +450,7 @@ with tab_models:
     st.markdown(
         "<p class='muted'>Predicting log(1 + resolution_hours) from department, neighborhood, "
         "and (optionally) year. LASSO uses 5-fold cross-validated lambda; stepwise uses AIC. "
-        "Fits run on a 30K-row sample so the three models fit inside the free-tier deploy budget.</p>",
+        "Fits run on a 15K-row sample so the three models fit inside the free-tier deploy budget.</p>",
         unsafe_allow_html=True,
     )
 
@@ -458,7 +458,7 @@ with tab_models:
     run = st.button("Fit models", type="primary")
 
     if run:
-        progress = st.progress(0, text="Preparing 30K-row sample...")
+        progress = st.progress(0, text="Preparing 15K-row sample...")
         try:
             progress.progress(20, text="Fitting OLS...")
             # Cache key only depends on year_range and include_year; the call

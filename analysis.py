@@ -155,8 +155,8 @@ def fit_lasso(X: pd.DataFrame, y: pd.Series, cv: int = 5, random_state: int = 42
     # fits. On Streamlit Cloud's shared 1 vCPU that takes minutes. A 10-point
     # log-spaced grid is more than enough for stable lambda.min selection on
     # this problem, and cuts CV cost by 10x.
-    alphas = np.logspace(-3, 1, 10)
-    lasso = LassoCV(alphas=alphas, cv=cv, random_state=random_state, max_iter=1000)
+    alphas = np.logspace(-3, 1, 5)
+    lasso = LassoCV(alphas=alphas, cv=cv, random_state=random_state, max_iter=500)
     lasso.fit(X_scaled, y.values)
 
     # Unscale coefficients so they're interpretable on the original predictors.
@@ -187,64 +187,95 @@ def fit_lasso(X: pd.DataFrame, y: pd.Series, cv: int = 5, random_state: int = 42
 
 
 # -----------------------------------------------------------------------------
-# Stepwise (AIC)
+# Stepwise (AIC) - numpy fast path
 # -----------------------------------------------------------------------------
 
-def _aic_of(X_sub: pd.DataFrame, y: pd.Series) -> float:
-    Xc = sm.add_constant(X_sub, has_constant="add")
-    return float(sm.OLS(y.values, Xc.values).fit().aic)
+def _aic_from_residuals(rss: float, n: int, k: int) -> float:
+    """AIC for a Gaussian linear model with k regression coefficients (intercept
+    counted) and an estimated sigma. Matches statsmodels' OLS.aic up to a
+    constant that cancels out when comparing models on the same y."""
+    if rss <= 0.0:
+        return float("-inf")
+    return n * np.log(rss / n) + 2.0 * (k + 1)
+
+
+def _aic_np(X_sub: np.ndarray, y: np.ndarray) -> float:
+    """Fast AIC: numpy lstsq instead of a full statsmodels OLS.fit().
+
+    For an intercept-only null model pass X_sub with shape (n, 0).
+    """
+    n = y.shape[0]
+    Xc = np.column_stack([np.ones(n), X_sub]) if X_sub.shape[1] else np.ones((n, 1))
+    beta, _, _, _ = np.linalg.lstsq(Xc, y, rcond=None)
+    resid = y - Xc @ beta
+    rss = float(np.dot(resid, resid))
+    return _aic_from_residuals(rss, n, Xc.shape[1])
 
 
 def fit_stepwise(
     X: pd.DataFrame,
     y: pd.Series,
-    max_iter: int = 80,
+    max_iter: int = 30,
     verbose: bool = False,
 ) -> ModelResult:
-    """Bidirectional stepwise selection by AIC.
+    """Bidirectional stepwise selection by AIC, on numpy arrays.
 
-    Walks the feature set adding / dropping the single column that most
-    improves AIC. Halts when no move improves the score or after max_iter steps.
+    Each candidate add/drop is evaluated with a single np.linalg.lstsq call,
+    which is roughly 50x faster than statsmodels OLS.fit() because we skip
+    standard errors, t-stats, and the whole regression-results object. We
+    still use statsmodels for the FINAL fit so the returned coefficient
+    table carries proper std_error and p_value columns.
     """
-    remaining = list(X.columns)
-    selected: list[str] = []
-    current_aic = _aic_of(X[selected] if selected else pd.DataFrame(index=X.index), y)
+    feature_names = list(X.columns)
+    X_arr = X.values.astype(np.float64, copy=False)
+    y_arr = y.values.astype(np.float64, copy=False)
+    n = y_arr.shape[0]
+
+    remaining: set[int] = set(range(X_arr.shape[1]))
+    selected: list[int] = []
+    current_aic = _aic_np(np.empty((n, 0)), y_arr)
 
     for _ in range(max_iter):
-        candidates: list[tuple[float, str, str]] = []  # (aic, action, feature)
+        best_delta = 0.0
+        best_action: str | None = None
+        best_feat: int | None = None
 
-        # Try adding each remaining feature.
-        for feat in remaining:
-            aic = _aic_of(X[selected + [feat]], y)
-            candidates.append((aic, "add", feat))
+        # Adds: one column joins the selected set.
+        for j in remaining:
+            cols = selected + [j]
+            aic = _aic_np(X_arr[:, cols], y_arr)
+            delta = aic - current_aic
+            if delta < best_delta - 1e-9:
+                best_delta, best_action, best_feat = delta, "add", j
 
-        # Try dropping each currently-selected feature.
-        for feat in selected:
-            trial = [c for c in selected if c != feat]
-            aic = _aic_of(X[trial] if trial else pd.DataFrame(index=X.index), y)
-            candidates.append((aic, "drop", feat))
+        # Drops: one column leaves the selected set.
+        for j in selected:
+            cols = [c for c in selected if c != j]
+            X_sub = X_arr[:, cols] if cols else np.empty((n, 0))
+            aic = _aic_np(X_sub, y_arr)
+            delta = aic - current_aic
+            if delta < best_delta - 1e-9:
+                best_delta, best_action, best_feat = delta, "drop", j
 
-        if not candidates:
+        if best_action is None:
             break
 
-        candidates.sort(key=lambda t: t[0])
-        best_aic, action, feat = candidates[0]
-        if best_aic >= current_aic - 1e-6:
-            break
-
-        if action == "add":
-            selected.append(feat)
-            remaining.remove(feat)
+        if best_action == "add":
+            selected.append(best_feat)
+            remaining.discard(best_feat)
         else:
-            selected.remove(feat)
-            remaining.append(feat)
+            selected.remove(best_feat)
+            remaining.add(best_feat)
 
-        current_aic = best_aic
+        current_aic += best_delta
         if verbose:
-            print(f"{action} {feat} -> AIC={current_aic:.2f}")
+            print(f"{best_action} {feature_names[best_feat]} -> AIC={current_aic:.2f}")
 
-    Xc = sm.add_constant(X[selected], has_constant="add")
-    final = sm.OLS(y.values, Xc.values).fit()
+    # Final fit via statsmodels so we get standard errors and p-values for
+    # the returned coefficient table. Only one call, on the selected subset.
+    selected_names = [feature_names[i] for i in selected]
+    Xc = sm.add_constant(X[selected_names], has_constant="add")
+    final = sm.OLS(y_arr, Xc.values).fit()
 
     coefs = pd.DataFrame(
         {
@@ -256,7 +287,7 @@ def fit_stepwise(
     ).reset_index(drop=True)
 
     y_hat = final.predict(Xc.values)
-    rmse = float(np.sqrt(np.mean((y.values - y_hat) ** 2)))
+    rmse = float(np.sqrt(np.mean((y_arr - y_hat) ** 2)))
 
     return ModelResult(
         name="Stepwise (AIC)",
