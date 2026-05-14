@@ -1,0 +1,16 @@
+# Raw CSVs and local-only caches (the deploy snapshot under data/processed/ IS committed).
+data/raw/
+data/*.parquet
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store

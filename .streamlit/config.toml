@@ -1,0 +1,7 @@
+[theme]
+# Tight 4-color palette: slate primary, coral accent, muted gray, cream surface.
+primaryColor = "#D85A30"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F2F0EA"
+textColor = "#2C2C2A"
+font = "sans serif"
