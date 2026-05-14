@@ -151,7 +151,12 @@ def fit_lasso(X: pd.DataFrame, y: pd.Series, cv: int = 5, random_state: int = 42
     scaler = StandardScaler(with_mean=True, with_std=True)
     X_scaled = scaler.fit_transform(X.values)
 
-    lasso = LassoCV(cv=cv, random_state=random_state, max_iter=5000)
+    # sklearn 1.8 defaults to n_alphas=100 which means 100 * cv = 500 Lasso
+    # fits. On Streamlit Cloud's shared 1 vCPU that takes minutes. A 10-point
+    # log-spaced grid is more than enough for stable lambda.min selection on
+    # this problem, and cuts CV cost by 10x.
+    alphas = np.logspace(-3, 1, 10)
+    lasso = LassoCV(alphas=alphas, cv=cv, random_state=random_state, max_iter=1000)
     lasso.fit(X_scaled, y.values)
 
     # Unscale coefficients so they're interpretable on the original predictors.
@@ -271,8 +276,8 @@ def run_all_models(
     df: pd.DataFrame,
     include_year: bool = True,
     sample_n: int | None = 50_000,
-    stepwise_max_features: int = 15,
-    stepwise_max_iter: int = 30,
+    stepwise_max_features: int = 12,
+    stepwise_max_iter: int = 15,
 ) -> tuple[dict[str, ModelResult], pd.DataFrame]:
     """Fit OLS, LASSO, and stepwise on the same design matrix.
 

@@ -75,20 +75,15 @@ def load_full_data() -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def run_models_cached(year_lo: int, year_hi: int, include_year: bool) -> tuple[dict, pd.DataFrame]:
+    """Slim, single-pass model fitting tuned for the free tier."""
     import gc
 
     full = load_full_data()
-    # Slim down BEFORE doing anything else - only carry the columns the models
-    # need. Streamlit Cloud's 1 GB cap was OOM'ing because the full DataFrame
-    # was being duplicated by the .loc filter.
     needed = ["department", "neighborhood", "year", "resolution_hours"]
     df = full.loc[
         (full["year"] >= year_lo) & (full["year"] <= year_hi),
         needed,
     ].copy()
-    # Pre-sample to 30K so the design matrix, scaler copy, and LASSO CV folds
-    # all stay tiny. This is plenty for stable coefficient estimates - on the
-    # real data the signal is strong enough that 30K matches 1M closely.
     if len(df) > 30_000:
         df = df.sample(n=30_000, random_state=42).reset_index(drop=True)
     gc.collect()
@@ -463,8 +458,15 @@ with tab_models:
     run = st.button("Fit models", type="primary")
 
     if run:
-        with st.spinner("Fitting OLS, LASSO, and Stepwise (30K-row sample)..."):
+        progress = st.progress(0, text="Preparing 30K-row sample...")
+        try:
+            progress.progress(20, text="Fitting OLS...")
+            # Cache key only depends on year_range and include_year; the call
+            # below is fast on a warm cache and slow on a cold cache.
             results, comparison = run_models_cached(year_range[0], year_range[1], include_year)
+            progress.progress(100, text="Done")
+        finally:
+            progress.empty()
 
         m1, m2, m3 = st.columns(3)
         for col, key in zip((m1, m2, m3), ("OLS", "LASSO", "Stepwise")):
