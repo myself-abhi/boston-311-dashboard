@@ -231,7 +231,7 @@ with tab_overview:
             xaxis_title="Resolution hours",
             yaxis_title="Cases",
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         st.caption(
             "Heavily right-skewed: most cases resolve quickly, a small share runs for thousands of hours."
         )
@@ -259,7 +259,7 @@ with tab_overview:
             yaxis_title="Hours",
             legend=dict(orientation="h", y=1.1),
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         st.caption(
             "Means drift up as a small group of very slow cases grows; medians actually fall."
         )
@@ -295,7 +295,7 @@ with tab_overview:
         xaxis=dict(dtick=1),
         legend_title_text="",
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 # -- Departments -------------------------------------------------------------
@@ -321,7 +321,7 @@ with tab_dept:
         labels={"mean": "Mean hours", "department": "Department"},
     )
     fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=460, coloraxis_showscale=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.markdown("<p class='section-title'>Departmental detail</p>", unsafe_allow_html=True)
     display = dept_stats.copy()
@@ -332,7 +332,7 @@ with tab_dept:
         "department": "Department", "count": "Cases",
         "mean": "Mean (h)", "median": "Median (h)", "sd": "SD (h)"
     })
-    st.dataframe(display, use_container_width=True, hide_index=True)
+    st.dataframe(display, width="stretch", hide_index=True)
 
     st.caption(
         "Means are inflated by long-tail outliers; the median column shows the typical case."
@@ -368,7 +368,7 @@ with tab_nbhd:
         labels={"mean": "Mean hours", "neighborhood": "Neighborhood"},
     )
     fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=520, coloraxis_showscale=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     geo = df.dropna(subset=["latitude", "longitude"]).copy()
     if len(geo) > 5000:
@@ -378,7 +378,10 @@ with tab_nbhd:
             "<p class='section-title'>Sample of cases on the map (random 5K)</p>",
             unsafe_allow_html=True,
         )
-        st.map(geo[["latitude", "longitude"]].dropna(), size=2)
+        # st.map serializes through stdlib json which doesn't understand
+        # numpy.float32; cast to native Python float64 first.
+        geo_points = geo[["latitude", "longitude"]].dropna().astype("float64")
+        st.map(geo_points, size=2)
 
 
 # -- Time trends -------------------------------------------------------------
@@ -411,7 +414,7 @@ with tab_time:
         fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=380)
 
     fig.update_yaxes(title="Mean resolution hours")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.markdown("<p class='section-title'>Weekly trend</p>", unsafe_allow_html=True)
     weekly = (
@@ -422,7 +425,7 @@ with tab_time:
                   color_discrete_sequence=[PRIMARY])
     fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320,
                       xaxis_title="Week", yaxis_title="Mean hours")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 # -- Models ------------------------------------------------------------------
@@ -479,13 +482,13 @@ with tab_models:
         )
         fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=620,
                           yaxis_title="", xaxis_title="Coefficient (log scale)")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         st.markdown("<p class='section-title'>Full coefficient table</p>", unsafe_allow_html=True)
         table = comparison.copy()
         for col in ("OLS", "LASSO", "Stepwise"):
             table[col] = table[col].round(3)
-        st.dataframe(table, use_container_width=True, hide_index=True)
+        st.dataframe(table, width="stretch", hide_index=True)
     else:
         st.info(
             "Click **Fit models** to run OLS, LASSO, and stepwise on the current filter set. "
