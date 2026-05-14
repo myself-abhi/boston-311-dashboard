@@ -283,10 +283,16 @@ def run_all_models(
     Returns (results, comparison_table). The comparison table joins the three
     coefficient tables on `term` so the UI can put them side by side.
     """
+    import gc
+
     X, y, _ = build_design_matrix(df, include_year=include_year, sample_n=sample_n)
 
     ols = fit_ols(X, y)
+    gc.collect()
+
     lasso = fit_lasso(X, y)
+    gc.collect()
+
     # Stepwise is O(features * iterations) so we cap aggressively.
     if X.shape[1] > stepwise_max_features:
         variances = X.var(axis=0).sort_values(ascending=False)
@@ -294,6 +300,8 @@ def run_all_models(
         step = fit_stepwise(X[keep], y, max_iter=stepwise_max_iter)
     else:
         step = fit_stepwise(X, y, max_iter=stepwise_max_iter)
+    del X, y
+    gc.collect()
 
     comparison = (
         ols.coefficients[["term", "estimate"]]

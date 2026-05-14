@@ -75,12 +75,29 @@ def load_full_data() -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def run_models_cached(year_lo: int, year_hi: int, include_year: bool) -> tuple[dict, pd.DataFrame]:
-    df = load_full_data()
-    df = df.loc[(df["year"] >= year_lo) & (df["year"] <= year_hi)]
-    # 50K sample keeps stepwise refits inside Streamlit Cloud's free-tier
-    # websocket timeout. Locally you can call analysis.run_all_models directly
-    # with a larger sample_n for the full picture.
-    results, comparison = analysis.run_all_models(df, include_year=include_year, sample_n=50_000)
+    import gc
+
+    full = load_full_data()
+    # Slim down BEFORE doing anything else - only carry the columns the models
+    # need. Streamlit Cloud's 1 GB cap was OOM'ing because the full DataFrame
+    # was being duplicated by the .loc filter.
+    needed = ["department", "neighborhood", "year", "resolution_hours"]
+    df = full.loc[
+        (full["year"] >= year_lo) & (full["year"] <= year_hi),
+        needed,
+    ].copy()
+    # Pre-sample to 30K so the design matrix, scaler copy, and LASSO CV folds
+    # all stay tiny. This is plenty for stable coefficient estimates - on the
+    # real data the signal is strong enough that 30K matches 1M closely.
+    if len(df) > 30_000:
+        df = df.sample(n=30_000, random_state=42).reset_index(drop=True)
+    gc.collect()
+
+    results, comparison = analysis.run_all_models(
+        df, include_year=include_year, sample_n=None
+    )
+    del df
+    gc.collect()
     return results, comparison
 
 
@@ -438,7 +455,7 @@ with tab_models:
     st.markdown(
         "<p class='muted'>Predicting log(1 + resolution_hours) from department, neighborhood, "
         "and (optionally) year. LASSO uses 5-fold cross-validated lambda; stepwise uses AIC. "
-        "Fits run on a 50K-row sample so stepwise stays inside the free-tier deploy budget.</p>",
+        "Fits run on a 30K-row sample so the three models fit inside the free-tier deploy budget.</p>",
         unsafe_allow_html=True,
     )
 
@@ -446,7 +463,7 @@ with tab_models:
     run = st.button("Fit models", type="primary")
 
     if run:
-        with st.spinner("Fitting OLS, LASSO, and Stepwise (50K-row sample)..."):
+        with st.spinner("Fitting OLS, LASSO, and Stepwise (30K-row sample)..."):
             results, comparison = run_models_cached(year_range[0], year_range[1], include_year)
 
         m1, m2, m3 = st.columns(3)
