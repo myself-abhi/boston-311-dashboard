@@ -445,78 +445,138 @@ with tab_time:
 
 # -- Models ------------------------------------------------------------------
 
-with tab_models:
-    st.markdown("<p class='section-title'>OLS, LASSO, and Stepwise regression</p>", unsafe_allow_html=True)
-    st.markdown(
-        "<p class='muted'>Predicting log(1 + resolution_hours) from department, neighborhood, "
-        "and (optionally) year. LASSO uses 5-fold cross-validated lambda; stepwise uses AIC. "
-        "Fits run on a 15K-row sample so the three models fit inside the free-tier deploy budget.</p>",
-        unsafe_allow_html=True,
+import json as _json
+from pathlib import Path as _Path
+
+PRECOMPUTED_PATH = _Path(__file__).resolve().parent / "data" / "processed" / "model_results.json"
+
+
+@st.cache_data(show_spinner=False)
+def load_precomputed_models() -> dict | None:
+    """Return the pre-computed model results dict, or None if the file is absent."""
+    if not PRECOMPUTED_PATH.exists():
+        return None
+    try:
+        return _json.loads(PRECOMPUTED_PATH.read_text())
+    except Exception:
+        return None
+
+
+def _render_models_from_payload(payload: dict) -> None:
+    """Render the Models tab UI from a pre-computed JSON payload."""
+    meta = payload.get("metadata", {})
+    results = payload.get("results", {})
+    comparison = pd.DataFrame(payload.get("comparison", []))
+
+    st.caption(
+        f"Fit on {meta.get('n_rows_used', '?'):,} cases, "
+        f"sampled to {meta.get('sample_n', '?'):,} rows. "
+        f"Computed {meta.get('computed_at', 'offline')}."
     )
 
-    include_year = st.checkbox("Include year as a predictor", value=True)
-    run = st.button("Fit models", type="primary")
-
-    if run:
-        progress = st.progress(0, text="Preparing 15K-row sample...")
-        try:
-            progress.progress(20, text="Fitting OLS...")
-            # Cache key only depends on year_range and include_year; the call
-            # below is fast on a warm cache and slow on a cold cache.
-            results, comparison = run_models_cached(year_range[0], year_range[1], include_year)
-            progress.progress(100, text="Done")
-        finally:
-            progress.empty()
-
-        m1, m2, m3 = st.columns(3)
-        for col, key in zip((m1, m2, m3), ("OLS", "LASSO", "Stepwise")):
-            r = results[key]
-            col.markdown(
-                f"<div class='kpi-card'>"
-                f"<p class='kpi-label'>{r.name}</p>"
-                f"<p class='kpi-value'>R&sup2; {r.r2:.3f}</p>"
-                f"<p class='muted'>RMSE {r.rmse:.3f} &middot; {r.n_features} features &middot; n={r.n_obs:,}</p>"
-                f"</div>",
-                unsafe_allow_html=True,
-            )
-
-        st.markdown("<p class='section-title'>Coefficient comparison</p>", unsafe_allow_html=True)
-
-        # Drop the intercept for the comparison plot - it dominates the y-axis.
-        plot_df = comparison[comparison["term"] != "const"].copy()
-        # Show top 20 by max absolute coefficient across models.
-        plot_df["max_abs"] = plot_df[["OLS", "LASSO", "Stepwise"]].abs().max(axis=1)
-        plot_df = plot_df.sort_values("max_abs", ascending=False).head(20)
-
-        long = plot_df.melt(
-            id_vars="term",
-            value_vars=["OLS", "LASSO", "Stepwise"],
-            var_name="Model",
-            value_name="Coefficient",
+    m1, m2, m3 = st.columns(3)
+    for col, key in zip((m1, m2, m3), ("OLS", "LASSO", "Stepwise")):
+        r = results.get(key)
+        if not r:
+            continue
+        col.markdown(
+            f"<div class='kpi-card'>"
+            f"<p class='kpi-label'>{r['name']}</p>"
+            f"<p class='kpi-value'>R&sup2; {r['r2']:.3f}</p>"
+            f"<p class='muted'>RMSE {r['rmse']:.3f} &middot; {r['n_features']} features &middot; n={r['n_obs']:,}</p>"
+            f"</div>",
+            unsafe_allow_html=True,
         )
-        fig = px.bar(
-            long,
-            x="Coefficient",
-            y="term",
-            color="Model",
-            barmode="group",
-            color_discrete_map={"OLS": PRIMARY, "LASSO": ACCENT, "Stepwise": MUTED},
-            orientation="h",
-        )
-        fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=620,
-                          yaxis_title="", xaxis_title="Coefficient (log scale)")
-        st.plotly_chart(fig, width="stretch")
 
-        st.markdown("<p class='section-title'>Full coefficient table</p>", unsafe_allow_html=True)
-        table = comparison.copy()
-        for col in ("OLS", "LASSO", "Stepwise"):
-            table[col] = table[col].round(3)
-        st.dataframe(table, width="stretch", hide_index=True)
+    st.markdown("<p class='section-title'>Coefficient comparison</p>", unsafe_allow_html=True)
+    plot_df = comparison[comparison["term"] != "const"].copy()
+    plot_df["max_abs"] = plot_df[["OLS", "LASSO", "Stepwise"]].abs().max(axis=1)
+    plot_df = plot_df.sort_values("max_abs", ascending=False).head(20)
+
+    long = plot_df.melt(
+        id_vars="term",
+        value_vars=["OLS", "LASSO", "Stepwise"],
+        var_name="Model",
+        value_name="Coefficient",
+    )
+    fig = px.bar(
+        long,
+        x="Coefficient",
+        y="term",
+        color="Model",
+        barmode="group",
+        color_discrete_map={"OLS": PRIMARY, "LASSO": ACCENT, "Stepwise": MUTED},
+        orientation="h",
+    )
+    fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=620,
+                      yaxis_title="", xaxis_title="Coefficient (log scale)")
+    st.plotly_chart(fig, width="stretch")
+
+    st.markdown("<p class='section-title'>Full coefficient table</p>", unsafe_allow_html=True)
+    table = comparison.copy()
+    for col in ("OLS", "LASSO", "Stepwise"):
+        table[col] = table[col].round(3)
+    st.dataframe(table, width="stretch", hide_index=True)
+
+
+with tab_models:
+    st.markdown("<p class='section-title'>OLS, LASSO, and Stepwise regression</p>", unsafe_allow_html=True)
+
+    payload = load_precomputed_models()
+
+    if payload is not None:
+        st.markdown(
+            "<p class='muted'>Predicting log(1 + resolution_hours) from department, "
+            "neighborhood, and year. LASSO uses 5-fold cross-validated lambda; "
+            "stepwise uses AIC. Results below were pre-computed offline on the "
+            "full dataset and shipped with the app.</p>",
+            unsafe_allow_html=True,
+        )
+        _render_models_from_payload(payload)
     else:
-        st.info(
-            "Click **Fit models** to run OLS, LASSO, and stepwise on the current filter set. "
-            "First run takes about 30 seconds; results are cached after."
+        st.markdown(
+            "<p class='muted'>Pre-computed results file not found. Falling back "
+            "to live fit on a 15K-row sample.</p>",
+            unsafe_allow_html=True,
         )
+        include_year = st.checkbox("Include year as a predictor", value=True)
+        run = st.button("Fit models", type="primary")
+        if run:
+            with st.spinner("Fitting OLS, LASSO, and Stepwise (15K-row sample)..."):
+                results, comparison = run_models_cached(year_range[0], year_range[1], include_year)
+            m1, m2, m3 = st.columns(3)
+            for col, key in zip((m1, m2, m3), ("OLS", "LASSO", "Stepwise")):
+                r = results[key]
+                col.markdown(
+                    f"<div class='kpi-card'>"
+                    f"<p class='kpi-label'>{r.name}</p>"
+                    f"<p class='kpi-value'>R&sup2; {r.r2:.3f}</p>"
+                    f"<p class='muted'>RMSE {r.rmse:.3f} &middot; {r.n_features} features &middot; n={r.n_obs:,}</p>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
+            st.markdown("<p class='section-title'>Coefficient comparison</p>", unsafe_allow_html=True)
+            plot_df = comparison[comparison["term"] != "const"].copy()
+            plot_df["max_abs"] = plot_df[["OLS", "LASSO", "Stepwise"]].abs().max(axis=1)
+            plot_df = plot_df.sort_values("max_abs", ascending=False).head(20)
+            long = plot_df.melt(
+                id_vars="term",
+                value_vars=["OLS", "LASSO", "Stepwise"],
+                var_name="Model",
+                value_name="Coefficient",
+            )
+            fig = px.bar(long, x="Coefficient", y="term", color="Model", barmode="group",
+                         color_discrete_map={"OLS": PRIMARY, "LASSO": ACCENT, "Stepwise": MUTED},
+                         orientation="h")
+            fig.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=620,
+                              yaxis_title="", xaxis_title="Coefficient (log scale)")
+            st.plotly_chart(fig, width="stretch")
+        else:
+            st.info(
+                "Click **Fit models** to run OLS, LASSO, and stepwise. "
+                "On the free tier this can take a while - if it stalls, run "
+                "`python precompute_models.py` locally and commit the JSON."
+            )
 
 
 # -----------------------------------------------------------------------------

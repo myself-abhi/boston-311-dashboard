@@ -1,0 +1,825 @@
+{
+  "metadata": {
+    "computed_at": "2026-05-14T21:35:36+00:00",
+    "sample_n": 200000,
+    "stepwise_max_features": 25,
+    "stepwise_max_iter": 60,
+    "n_rows_used": 1115495,
+    "year_range": [
+      2015,
+      2019
+    ],
+    "include_year": true
+  },
+  "results": {
+    "OLS": {
+      "name": "OLS",
+      "r2": 0.17842065816170882,
+      "rmse": 2.2978681289421,
+      "n_obs": 200000,
+      "n_features": 35,
+      "coefficients": [
+        {
+          "term": "const",
+          "estimate": 212.01249344255274,
+          "std_error": 7.572634029976587,
+          "p_value": 3.7892777556231115e-172
+        },
+        {
+          "term": "year",
+          "estimate": -0.1034972235463959,
+          "std_error": 0.0037528760144804525,
+          "p_value": 4.198754896371617e-167
+        },
+        {
+          "term": "department_BHA_",
+          "estimate": 1.1074425983859855,
+          "std_error": 1.046408437236484,
+          "p_value": 0.28990753704766825
+        },
+        {
+          "term": "department_BPD_",
+          "estimate": 0.5739632866065518,
+          "std_error": 0.79082446721269,
+          "p_value": 0.4679755031486774
+        },
+        {
+          "term": "department_BPS_",
+          "estimate": 3.21032203208261,
+          "std_error": 0.5762038553057505,
+          "p_value": 2.528734701719836e-08
+        },
+        {
+          "term": "department_BTDT",
+          "estimate": -0.5541805401617516,
+          "std_error": 0.19668089829050572,
+          "p_value": 0.004837925918302116
+        },
+        {
+          "term": "department_BWSC",
+          "estimate": 1.6767133501251843,
+          "std_error": 0.20808052502485103,
+          "p_value": 7.797369518295555e-16
+        },
+        {
+          "term": "department_DISB",
+          "estimate": -2.074705339060089,
+          "std_error": 0.24772928708136932,
+          "p_value": 5.562646433913847e-17
+        },
+        {
+          "term": "department_DND_",
+          "estimate": 1.3819091552992564,
+          "std_error": 0.7527985404121673,
+          "p_value": 0.06640413637613783
+        },
+        {
+          "term": "department_GEN_",
+          "estimate": -1.534443903185511,
+          "std_error": 0.2004551703374672,
+          "p_value": 1.9447685905916395e-14
+        },
+        {
+          "term": "department_INFO",
+          "estimate": 2.4413648993055497,
+          "std_error": 0.1994666860551914,
+          "p_value": 1.9681057566280184e-34
+        },
+        {
+          "term": "department_ISD",
+          "estimate": 2.210908304712247,
+          "std_error": 0.19721427419869522,
+          "p_value": 3.6868016667669126e-29
+        },
+        {
+          "term": "department_No Q",
+          "estimate": 4.2524964713895335,
+          "std_error": 2.3065413290585006,
+          "p_value": 0.06523301592071597
+        },
+        {
+          "term": "department_PARK",
+          "estimate": 1.8961057830955308,
+          "std_error": 0.19749631340638746,
+          "p_value": 8.025781624877714e-22
+        },
+        {
+          "term": "department_PROP",
+          "estimate": 2.5743796643814387,
+          "std_error": 0.20036928746701735,
+          "p_value": 9.11510448622636e-38
+        },
+        {
+          "term": "department_PWDx",
+          "estimate": -0.4075082965754897,
+          "std_error": 0.1964812480415954,
+          "p_value": 0.03807766260581322
+        },
+        {
+          "term": "neighborhood_Back Bay",
+          "estimate": -0.10334674263124591,
+          "std_error": 0.029687161278995556,
+          "p_value": 0.0004992917929305848
+        },
+        {
+          "term": "neighborhood_Beacon Hill",
+          "estimate": -0.36069881847644625,
+          "std_error": 0.03494776280599235,
+          "p_value": 5.740367213516627e-25
+        },
+        {
+          "term": "neighborhood_Boston",
+          "estimate": -0.2750876429838522,
+          "std_error": 0.03433401122061309,
+          "p_value": 1.1336352491441343e-15
+        },
+        {
+          "term": "neighborhood_Charlestown",
+          "estimate": 0.07580766512131698,
+          "std_error": 0.034482871326967326,
+          "p_value": 0.027920679841852817
+        },
+        {
+          "term": "neighborhood_Dorchester",
+          "estimate": 0.13881574498119384,
+          "std_error": 0.02361522826627286,
+          "p_value": 4.1533114759336475e-09
+        },
+        {
+          "term": "neighborhood_Downtown / Financial District",
+          "estimate": -0.2647665302720043,
+          "std_error": 0.02753194802571256,
+          "p_value": 6.872227534030923e-22
+        },
+        {
+          "term": "neighborhood_East Boston",
+          "estimate": -0.045856066614824345,
+          "std_error": 0.02929010498312302,
+          "p_value": 0.11744804527298743
+        },
+        {
+          "term": "neighborhood_Fenway / Kenmore / Audubon Circle / Longwood",
+          "estimate": -0.032139551394238255,
+          "std_error": 0.039450602017123325,
+          "p_value": 0.4152574188246039
+        },
+        {
+          "term": "neighborhood_Greater Mattapan",
+          "estimate": 0.3704415654636314,
+          "std_error": 0.032136005038286605,
+          "p_value": 9.828069220025167e-31
+        },
+        {
+          "term": "neighborhood_Hyde Park",
+          "estimate": 0.18476385296120054,
+          "std_error": 0.03122980773233409,
+          "p_value": 3.2986554170815154e-09
+        },
+        {
+          "term": "neighborhood_Jamaica Plain",
+          "estimate": 0.22122860033254424,
+          "std_error": 0.028150151069571434,
+          "p_value": 3.895019606129577e-15
+        },
+        {
+          "term": "neighborhood_Mission Hill",
+          "estimate": -0.07302112646520027,
+          "std_error": 0.04237630989136515,
+          "p_value": 0.0848612932057633
+        },
+        {
+          "term": "neighborhood_Other",
+          "estimate": -0.154114821244756,
+          "std_error": 0.059739685513569216,
+          "p_value": 0.009887237859879291
+        },
+        {
+          "term": "neighborhood_Roslindale",
+          "estimate": 0.17005050970347418,
+          "std_error": 0.03265762690465857,
+          "p_value": 1.920362148486653e-07
+        },
+        {
+          "term": "neighborhood_Roxbury",
+          "estimate": 0.007430853589558939,
+          "std_error": 0.025759910525383962,
+          "p_value": 0.7729904933429558
+        },
+        {
+          "term": "neighborhood_South Boston",
+          "estimate": -0.11534367358167483,
+          "std_error": 0.06172220758638464,
+          "p_value": 0.06165839262753296
+        },
+        {
+          "term": "neighborhood_South Boston / South Boston Waterfront",
+          "estimate": -0.15804914453641472,
+          "std_error": 0.027083500114372938,
+          "p_value": 5.367163364090222e-09
+        },
+        {
+          "term": "neighborhood_South End",
+          "estimate": -0.12475626611083265,
+          "std_error": 0.028947030246659643,
+          "p_value": 1.634711299000803e-05
+        },
+        {
+          "term": "neighborhood_Unknown",
+          "estimate": -0.6923036050415043,
+          "std_error": 0.043816247637284804,
+          "p_value": 3.3567638074815257e-56
+        },
+        {
+          "term": "neighborhood_West Roxbury",
+          "estimate": 0.259182544329691,
+          "std_error": 0.0327550215578114,
+          "p_value": 2.530252875479023e-15
+        }
+      ]
+    },
+    "LASSO": {
+      "name": "LASSO",
+      "r2": 0.1784124474447787,
+      "rmse": 2.2978796111548645,
+      "n_obs": 200000,
+      "n_features": 35,
+      "coefficients": [
+        {
+          "term": "const",
+          "estimate": 210.76081099207929,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "year",
+          "estimate": -0.1029595255907771,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_BHA_",
+          "estimate": 1.0690855953625504,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_BPD_",
+          "estimate": 0.5862331419056007,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_BPS_",
+          "estimate": 3.267668626838659,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_BTDT",
+          "estimate": -0.39034645606421753,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_BWSC",
+          "estimate": 1.82671073622369,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_DISB",
+          "estimate": -1.890635973190168,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_DND_",
+          "estimate": 1.4054743613429734,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_GEN_",
+          "estimate": -1.3656062145041397,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_INFO",
+          "estimate": 2.596229100651525,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_ISD",
+          "estimate": 2.3699879588536303,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_No Q",
+          "estimate": 3.965706867291632,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_PARK",
+          "estimate": 2.054116763662149,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_PROP",
+          "estimate": 2.727768381126215,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "department_PWDx",
+          "estimate": -0.24352664764898257,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Back Bay",
+          "estimate": -0.09461312564842775,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Beacon Hill",
+          "estimate": -0.35119399471292906,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Boston",
+          "estimate": -0.26460860649831014,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Charlestown",
+          "estimate": 0.07482165925226511,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Dorchester",
+          "estimate": 0.14066591196535963,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Downtown / Financial District",
+          "estimate": -0.2567672223710625,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_East Boston",
+          "estimate": -0.03721241776118432,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Fenway / Kenmore / Audubon Circle / Longwood",
+          "estimate": -0.020712787876150517,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Greater Mattapan",
+          "estimate": 0.37010292928857214,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Hyde Park",
+          "estimate": 0.1844859880270349,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Jamaica Plain",
+          "estimate": 0.22198453324786527,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Mission Hill",
+          "estimate": -0.06130959771130817,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Other",
+          "estimate": -0.13792282241843914,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Roslindale",
+          "estimate": 0.16947121233048176,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Roxbury",
+          "estimate": 0.00849039446571769,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_South Boston",
+          "estimate": -0.09898178111372968,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_South Boston / South Boston Waterfront",
+          "estimate": -0.15040399528696605,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_South End",
+          "estimate": -0.11681203498081126,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_Unknown",
+          "estimate": -0.6794187995241575,
+          "std_error": NaN,
+          "p_value": NaN
+        },
+        {
+          "term": "neighborhood_West Roxbury",
+          "estimate": 0.25877301387710516,
+          "std_error": NaN,
+          "p_value": NaN
+        }
+      ]
+    },
+    "Stepwise": {
+      "name": "Stepwise (AIC)",
+      "r2": 0.17102939661558658,
+      "rmse": 2.308181263217711,
+      "n_obs": 200000,
+      "n_features": 21,
+      "coefficients": [
+        {
+          "term": "const",
+          "estimate": 232.7905983507021,
+          "std_error": 7.575981007177998,
+          "p_value": 7.450278335709556e-207
+        },
+        {
+          "term": "department_ISD",
+          "estimate": 2.945702459789042,
+          "std_error": 0.037886599414411075,
+          "p_value": 0.0
+        },
+        {
+          "term": "department_PARK",
+          "estimate": 2.642426377937435,
+          "std_error": 0.03911555270490983,
+          "p_value": 0.0
+        },
+        {
+          "term": "department_INFO",
+          "estimate": 3.1870345457154423,
+          "std_error": 0.048173798785764735,
+          "p_value": 0.0
+        },
+        {
+          "term": "department_PROP",
+          "estimate": 3.3122556073971006,
+          "std_error": 0.05178655173583515,
+          "p_value": 0.0
+        },
+        {
+          "term": "year",
+          "estimate": -0.11417747942245952,
+          "std_error": 0.0037552111110136606,
+          "p_value": 1.3686543756234741e-202
+        },
+        {
+          "term": "neighborhood_Unknown",
+          "estimate": -0.751099604687666,
+          "std_error": 0.03959879846854703,
+          "p_value": 3.708053508624897e-80
+        },
+        {
+          "term": "department_PWDx",
+          "estimate": 0.3313719048979739,
+          "std_error": 0.03386156785258304,
+          "p_value": 1.3073310327632362e-22
+        },
+        {
+          "term": "neighborhood_Greater Mattapan",
+          "estimate": 0.4109971265107837,
+          "std_error": 0.027692861987856036,
+          "p_value": 8.4244025752742585e-50
+        },
+        {
+          "term": "neighborhood_Downtown / Financial District",
+          "estimate": -0.23322985718629868,
+          "std_error": 0.022184139880683074,
+          "p_value": 7.614788969013489e-26
+        },
+        {
+          "term": "neighborhood_Beacon Hill",
+          "estimate": -0.3247492693585866,
+          "std_error": 0.030951189426133657,
+          "p_value": 9.517169041001877e-26
+        },
+        {
+          "term": "neighborhood_Boston",
+          "estimate": -0.2565219165851205,
+          "std_error": 0.030211930661995772,
+          "p_value": 2.0668478459731778e-17
+        },
+        {
+          "term": "neighborhood_South Boston / South Boston Waterfront",
+          "estimate": -0.1409866530921999,
+          "std_error": 0.021613860461507105,
+          "p_value": 6.909017754994199e-11
+        },
+        {
+          "term": "neighborhood_South End",
+          "estimate": -0.14090669361192187,
+          "std_error": 0.02379102594551165,
+          "p_value": 3.172469812172174e-09
+        },
+        {
+          "term": "neighborhood_Back Bay",
+          "estimate": -0.07564047845174729,
+          "std_error": 0.024811477059281547,
+          "p_value": 0.002299339405437428
+        },
+        {
+          "term": "neighborhood_West Roxbury",
+          "estimate": 0.29923854359214475,
+          "std_error": 0.028398861287018653,
+          "p_value": 5.925761668560443e-26
+        },
+        {
+          "term": "neighborhood_Jamaica Plain",
+          "estimate": 0.254890204514288,
+          "std_error": 0.022927072349837506,
+          "p_value": 1.052192302833096e-28
+        },
+        {
+          "term": "department_BTDT",
+          "estimate": 0.1892460582526196,
+          "std_error": 0.03482931717016107,
+          "p_value": 5.531497329509164e-08
+        },
+        {
+          "term": "neighborhood_Dorchester",
+          "estimate": 0.1703289278714013,
+          "std_error": 0.016978941696453267,
+          "p_value": 1.1194711272585046e-23
+        },
+        {
+          "term": "neighborhood_Hyde Park",
+          "estimate": 0.22229769409937908,
+          "std_error": 0.026637267968012447,
+          "p_value": 7.143900280096406e-17
+        },
+        {
+          "term": "neighborhood_Roslindale",
+          "estimate": 0.21193249541248566,
+          "std_error": 0.028313702571036718,
+          "p_value": 7.175282486158596e-14
+        },
+        {
+          "term": "neighborhood_Charlestown",
+          "estimate": 0.11041817127807532,
+          "std_error": 0.030422942870225587,
+          "p_value": 0.0002841101937463543
+        }
+      ]
+    }
+  },
+  "comparison": [
+    {
+      "term": "const",
+      "OLS": 212.01249344255274,
+      "LASSO": 210.76081099207929,
+      "Stepwise": 232.7905983507021
+    },
+    {
+      "term": "department_BHA_",
+      "OLS": 1.1074425983859855,
+      "LASSO": 1.0690855953625504,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_BPD_",
+      "OLS": 0.5739632866065518,
+      "LASSO": 0.5862331419056007,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_BPS_",
+      "OLS": 3.21032203208261,
+      "LASSO": 3.267668626838659,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_BTDT",
+      "OLS": -0.5541805401617516,
+      "LASSO": -0.39034645606421753,
+      "Stepwise": 0.1892460582526196
+    },
+    {
+      "term": "department_BWSC",
+      "OLS": 1.6767133501251843,
+      "LASSO": 1.82671073622369,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_DISB",
+      "OLS": -2.074705339060089,
+      "LASSO": -1.890635973190168,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_DND_",
+      "OLS": 1.3819091552992564,
+      "LASSO": 1.4054743613429734,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_GEN_",
+      "OLS": -1.534443903185511,
+      "LASSO": -1.3656062145041397,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_INFO",
+      "OLS": 2.4413648993055497,
+      "LASSO": 2.596229100651525,
+      "Stepwise": 3.1870345457154423
+    },
+    {
+      "term": "department_ISD",
+      "OLS": 2.210908304712247,
+      "LASSO": 2.3699879588536303,
+      "Stepwise": 2.945702459789042
+    },
+    {
+      "term": "department_No Q",
+      "OLS": 4.2524964713895335,
+      "LASSO": 3.965706867291632,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "department_PARK",
+      "OLS": 1.8961057830955308,
+      "LASSO": 2.054116763662149,
+      "Stepwise": 2.642426377937435
+    },
+    {
+      "term": "department_PROP",
+      "OLS": 2.5743796643814387,
+      "LASSO": 2.727768381126215,
+      "Stepwise": 3.3122556073971006
+    },
+    {
+      "term": "department_PWDx",
+      "OLS": -0.4075082965754897,
+      "LASSO": -0.24352664764898257,
+      "Stepwise": 0.3313719048979739
+    },
+    {
+      "term": "neighborhood_Back Bay",
+      "OLS": -0.10334674263124591,
+      "LASSO": -0.09461312564842775,
+      "Stepwise": -0.07564047845174729
+    },
+    {
+      "term": "neighborhood_Beacon Hill",
+      "OLS": -0.36069881847644625,
+      "LASSO": -0.35119399471292906,
+      "Stepwise": -0.3247492693585866
+    },
+    {
+      "term": "neighborhood_Boston",
+      "OLS": -0.2750876429838522,
+      "LASSO": -0.26460860649831014,
+      "Stepwise": -0.2565219165851205
+    },
+    {
+      "term": "neighborhood_Charlestown",
+      "OLS": 0.07580766512131698,
+      "LASSO": 0.07482165925226511,
+      "Stepwise": 0.11041817127807532
+    },
+    {
+      "term": "neighborhood_Dorchester",
+      "OLS": 0.13881574498119384,
+      "LASSO": 0.14066591196535963,
+      "Stepwise": 0.1703289278714013
+    },
+    {
+      "term": "neighborhood_Downtown / Financial District",
+      "OLS": -0.2647665302720043,
+      "LASSO": -0.2567672223710625,
+      "Stepwise": -0.23322985718629868
+    },
+    {
+      "term": "neighborhood_East Boston",
+      "OLS": -0.045856066614824345,
+      "LASSO": -0.03721241776118432,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "neighborhood_Fenway / Kenmore / Audubon Circle / Longwood",
+      "OLS": -0.032139551394238255,
+      "LASSO": -0.020712787876150517,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "neighborhood_Greater Mattapan",
+      "OLS": 0.3704415654636314,
+      "LASSO": 0.37010292928857214,
+      "Stepwise": 0.4109971265107837
+    },
+    {
+      "term": "neighborhood_Hyde Park",
+      "OLS": 0.18476385296120054,
+      "LASSO": 0.1844859880270349,
+      "Stepwise": 0.22229769409937908
+    },
+    {
+      "term": "neighborhood_Jamaica Plain",
+      "OLS": 0.22122860033254424,
+      "LASSO": 0.22198453324786527,
+      "Stepwise": 0.254890204514288
+    },
+    {
+      "term": "neighborhood_Mission Hill",
+      "OLS": -0.07302112646520027,
+      "LASSO": -0.06130959771130817,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "neighborhood_Other",
+      "OLS": -0.154114821244756,
+      "LASSO": -0.13792282241843914,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "neighborhood_Roslindale",
+      "OLS": 0.17005050970347418,
+      "LASSO": 0.16947121233048176,
+      "Stepwise": 0.21193249541248566
+    },
+    {
+      "term": "neighborhood_Roxbury",
+      "OLS": 0.007430853589558939,
+      "LASSO": 0.00849039446571769,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "neighborhood_South Boston",
+      "OLS": -0.11534367358167483,
+      "LASSO": -0.09898178111372968,
+      "Stepwise": 0.0
+    },
+    {
+      "term": "neighborhood_South Boston / South Boston Waterfront",
+      "OLS": -0.15804914453641472,
+      "LASSO": -0.15040399528696605,
+      "Stepwise": -0.1409866530921999
+    },
+    {
+      "term": "neighborhood_South End",
+      "OLS": -0.12475626611083265,
+      "LASSO": -0.11681203498081126,
+      "Stepwise": -0.14090669361192187
+    },
+    {
+      "term": "neighborhood_Unknown",
+      "OLS": -0.6923036050415043,
+      "LASSO": -0.6794187995241575,
+      "Stepwise": -0.751099604687666
+    },
+    {
+      "term": "neighborhood_West Roxbury",
+      "OLS": 0.259182544329691,
+      "LASSO": 0.25877301387710516,
+      "Stepwise": 0.29923854359214475
+    },
+    {
+      "term": "year",
+      "OLS": -0.1034972235463959,
+      "LASSO": -0.1029595255907771,
+      "Stepwise": -0.11417747942245952
+    }
+  ]
+}
