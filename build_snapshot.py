@@ -77,8 +77,9 @@ def _shrink(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = df[col].astype("object")
 
     if "case_enquiry_id" in df.columns:
-        # ids fit in int64 -> int32 saves ~50% of column size
-        df["case_enquiry_id"] = pd.to_numeric(df["case_enquiry_id"], errors="coerce").astype("Int32")
+        # Boston 311 case IDs are 12-digit numbers, well beyond int32 range.
+        # Keep them as nullable Int64.
+        df["case_enquiry_id"] = pd.to_numeric(df["case_enquiry_id"], errors="coerce").astype("Int64")
     for c in ("year", "month", "week", "dayofweek", "slow_case"):
         if c in df.columns:
             df[c] = df[c].astype("Int16")
