@@ -52,8 +52,10 @@ SNAPSHOT_COLUMNS = [
     "dayofweek",
 ]
 
-# Columns to cast to pandas category to save memory and disk.
-CATEGORICAL_COLUMNS = (
+# Text columns. Kept as plain object on disk - parquet + Snappy already
+# dictionary-encodes repeated strings, so we get the size benefit without
+# pandas 3.0's strict category-dtype assignment rules biting downstream code.
+TEXT_COLUMNS = (
     "department",
     "subject",
     "reason",
@@ -70,9 +72,9 @@ def _shrink(df: pd.DataFrame) -> pd.DataFrame:
     keep = [c for c in SNAPSHOT_COLUMNS if c in df.columns]
     df = df[keep]
 
-    for col in CATEGORICAL_COLUMNS:
+    for col in TEXT_COLUMNS:
         if col in df.columns:
-            df[col] = df[col].astype("category")
+            df[col] = df[col].astype("object")
 
     if "case_enquiry_id" in df.columns:
         # ids fit in int64 -> int32 saves ~50% of column size

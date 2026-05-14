@@ -270,9 +270,10 @@ with tab_overview:
     )
     top5 = df["department"].value_counts().head(5).index.tolist()
     cat_df = df.copy()
-    cat_df["department_group"] = cat_df["department"].where(
-        cat_df["department"].isin(top5), other="Other"
-    )
+    # Force to object so .where(..., "Other") works on pandas 3.0 even if the
+    # column arrives as a CategoricalDtype.
+    dept_obj = cat_df["department"].astype("object")
+    cat_df["department_group"] = dept_obj.where(dept_obj.isin(top5), other="Other")
     pivot = (
         cat_df.groupby(["year", "department_group"]).size().reset_index(name="cases")
     )

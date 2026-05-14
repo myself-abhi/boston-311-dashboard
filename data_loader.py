@@ -193,14 +193,37 @@ def _processed_snapshot_paths() -> list[Path]:
     return sorted(PROCESSED_DIR.glob("boston_311_*.parquet"))
 
 
+_STRING_COLUMNS = (
+    "department",
+    "subject",
+    "reason",
+    "type",
+    "neighborhood",
+    "location_zipcode",
+    "precinct",
+    "case_status",
+    "source",
+)
+
+
 def _load_from_processed(paths: list[Path]) -> pd.DataFrame:
     frames = [pd.read_parquet(p) for p in paths]
     combined = pd.concat(frames, ignore_index=True, sort=False)
+
     # Ensure datetime types survive the round trip (parquet preserves them, but
     # be defensive in case the snapshot was produced by a different writer).
     for col in ("open_dt", "closed_dt"):
         if col in combined.columns and not pd.api.types.is_datetime64_any_dtype(combined[col]):
             combined[col] = pd.to_datetime(combined[col], errors="coerce")
+
+    # pandas 3.0: assigning to a categorical column with a value outside its
+    # categories raises. Coerce known text columns back to object/string so the
+    # downstream code (fillna with "Unknown", .where(... "Other"), groupby) is
+    # safe regardless of how the snapshot was built.
+    for col in _STRING_COLUMNS:
+        if col in combined.columns and isinstance(combined[col].dtype, pd.CategoricalDtype):
+            combined[col] = combined[col].astype("object")
+
     return combined
 
 

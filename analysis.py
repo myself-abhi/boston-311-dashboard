@@ -56,6 +56,13 @@ def build_design_matrix(
     """
     work = df.loc[df["resolution_hours"] > 0].copy()
 
+    # pandas 3.0: cast categorical -> object so fillna/assignment with new
+    # values ("Unknown", "Other") doesn't raise.
+    for col in ("department", "neighborhood"):
+        if isinstance(work[col].dtype, pd.CategoricalDtype):
+            work[col] = work[col].astype("object")
+        else:
+            work[col] = work[col].astype("object")
     work["department"] = work["department"].fillna("Unknown")
     work["neighborhood"] = work["neighborhood"].fillna("Unknown")
 
