@@ -77,7 +77,10 @@ def load_full_data() -> pd.DataFrame:
 def run_models_cached(year_lo: int, year_hi: int, include_year: bool) -> tuple[dict, pd.DataFrame]:
     df = load_full_data()
     df = df.loc[(df["year"] >= year_lo) & (df["year"] <= year_hi)]
-    results, comparison = analysis.run_all_models(df, include_year=include_year, sample_n=120_000)
+    # 50K sample keeps stepwise refits inside Streamlit Cloud's free-tier
+    # websocket timeout. Locally you can call analysis.run_all_models directly
+    # with a larger sample_n for the full picture.
+    results, comparison = analysis.run_all_models(df, include_year=include_year, sample_n=50_000)
     return results, comparison
 
 
@@ -434,7 +437,8 @@ with tab_models:
     st.markdown("<p class='section-title'>OLS, LASSO, and Stepwise regression</p>", unsafe_allow_html=True)
     st.markdown(
         "<p class='muted'>Predicting log(1 + resolution_hours) from department, neighborhood, "
-        "and (optionally) year. LASSO uses 5-fold cross-validated lambda; stepwise uses AIC.</p>",
+        "and (optionally) year. LASSO uses 5-fold cross-validated lambda; stepwise uses AIC. "
+        "Fits run on a 50K-row sample so stepwise stays inside the free-tier deploy budget.</p>",
         unsafe_allow_html=True,
     )
 
@@ -442,7 +446,7 @@ with tab_models:
     run = st.button("Fit models", type="primary")
 
     if run:
-        with st.spinner("Fitting OLS, LASSO, and Stepwise (sampled to 120K rows)..."):
+        with st.spinner("Fitting OLS, LASSO, and Stepwise (50K-row sample)..."):
             results, comparison = run_models_cached(year_range[0], year_range[1], include_year)
 
         m1, m2, m3 = st.columns(3)

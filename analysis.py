@@ -270,9 +270,15 @@ def fit_stepwise(
 def run_all_models(
     df: pd.DataFrame,
     include_year: bool = True,
-    sample_n: int | None = 150_000,
+    sample_n: int | None = 50_000,
+    stepwise_max_features: int = 15,
+    stepwise_max_iter: int = 30,
 ) -> tuple[dict[str, ModelResult], pd.DataFrame]:
     """Fit OLS, LASSO, and stepwise on the same design matrix.
+
+    Defaults are tuned for Streamlit Cloud's free tier (1 vCPU / 1 GB). The
+    full dataset is too costly for stepwise's O(features * iterations) full
+    OLS refits before the websocket times out, so we sample and prune.
 
     Returns (results, comparison_table). The comparison table joins the three
     coefficient tables on `term` so the UI can put them side by side.
@@ -281,14 +287,13 @@ def run_all_models(
 
     ols = fit_ols(X, y)
     lasso = fit_lasso(X, y)
-    # Stepwise is O(n_features^2) so we cap features to keep it responsive.
-    if X.shape[1] > 30:
-        # Drop low-variance dummies to keep stepwise tractable.
+    # Stepwise is O(features * iterations) so we cap aggressively.
+    if X.shape[1] > stepwise_max_features:
         variances = X.var(axis=0).sort_values(ascending=False)
-        keep = variances.head(30).index.tolist()
-        step = fit_stepwise(X[keep], y)
+        keep = variances.head(stepwise_max_features).index.tolist()
+        step = fit_stepwise(X[keep], y, max_iter=stepwise_max_iter)
     else:
-        step = fit_stepwise(X, y)
+        step = fit_stepwise(X, y, max_iter=stepwise_max_iter)
 
     comparison = (
         ols.coefficients[["term", "estimate"]]
