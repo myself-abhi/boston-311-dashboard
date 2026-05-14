@@ -83,9 +83,11 @@ def _shrink(df: pd.DataFrame) -> pd.DataFrame:
     for c in ("year", "month", "week", "dayofweek", "slow_case"):
         if c in df.columns:
             df[c] = df[c].astype("Int16")
+    # Keep lat/lon at float64. float32 trims size but Python's stdlib json
+    # (used by st.map under the hood) can't serialize numpy.float32 scalars.
     for c in ("latitude", "longitude"):
         if c in df.columns:
-            df[c] = df[c].astype("float32")
+            df[c] = df[c].astype("float64")
     for c in ("resolution_hours", "log_resolution"):
         if c in df.columns:
             df[c] = df[c].astype("float32")

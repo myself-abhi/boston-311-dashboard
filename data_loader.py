@@ -224,6 +224,12 @@ def _load_from_processed(paths: list[Path]) -> pd.DataFrame:
         if col in combined.columns and isinstance(combined[col].dtype, pd.CategoricalDtype):
             combined[col] = combined[col].astype("object")
 
+    # st.map (and Python stdlib json) cannot serialize numpy.float32 -- the
+    # snapshot stores lat/lon as float32 to save space, so promote on load.
+    for col in ("latitude", "longitude"):
+        if col in combined.columns:
+            combined[col] = combined[col].astype("float64")
+
     return combined
 
 
