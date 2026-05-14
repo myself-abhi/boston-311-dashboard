@@ -13,14 +13,22 @@ predictors are one-hot encoded with a configurable max number of levels.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Iterable
 
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LassoCV
 from sklearn.preprocessing import StandardScaler
+
+# LASSO at max_iter=500 with a 5-point alpha grid converges close enough for
+# coefficient comparison but sometimes trips ConvergenceWarning. The
+# coefficient estimates are still well within the variation we care about,
+# so silence the warning to keep the deploy log readable.
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 
 @dataclass
